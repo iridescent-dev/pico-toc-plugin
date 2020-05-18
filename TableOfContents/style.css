@@ -1,0 +1,42 @@
+#toc {
+    border          : 1px solid #cdd;
+    background-color: #f5f5ff;
+    margin          : 0;
+    padding         : 1em;
+    font-size       : 80%;
+}
+
+#toc ul {
+    list-style: none;
+    margin    : 0;
+    padding   : 0;
+}
+
+.toc-h1 {
+    margin-left: 0em;
+    margin-top : 1em;
+}
+
+.toc-h2 {
+    margin-left: 0.5em;
+    margin-top : 0.5em;
+}
+
+.toc-h3 {
+    margin-left: 1em;
+    margin-top : 0.3em;
+}
+
+.toc-h4 {
+    margin-left: 1.5em;
+    margin-top : 0.1em;
+}
+
+.toc-h5 {
+    margin-left: 2em;
+    margin-top : 0.05em;
+}
+
+.toc-h6 {
+    margin-left: 2.5em;
+}
