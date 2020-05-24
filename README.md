@@ -17,10 +17,12 @@ Generate a table of contents for the pages of your [Pico](http://picocms.org) si
 * Copy the `TableOfContents` folder into the `plugins` folder of your project.
 * Update your theme to include CSS style.
 * Define the configuration variables if default values are not suitable.
-* Add `<toc />` in your content files where you want the table of contents to appear.
+* Add `<toc />` element where you want the table of contents to appear on your page.
 
 ### Usage
-In your content markdown files, simply add the `<toc />` element where you want the table of contents to be inserted.
+Automatically generates a table of contents based on the elements `<h1>` to `<h6>` of your page.
+
+In the `.md` file corresponding to your page, simply add the `<toc />` element where you want the table of contents to be inserted. The `<toc />` element must be added for each page you want.
 
 ### Update your theme
 In your template files, add the plugin's CSS style in the `head` section:
