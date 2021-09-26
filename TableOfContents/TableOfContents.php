@@ -32,6 +32,9 @@ class TableOfContents extends AbstractPicoPlugin
         if (isset($config['toc_min_headers'])) {
             $this->min_headers = &$config['toc_min_headers'];
         }
+        if (isset($config['toc_heading'])) {
+            $this->heading = &$config['toc_heading'];
+        }
     }
 
     /**
@@ -83,6 +86,14 @@ class TableOfContents extends AbstractPicoPlugin
             // Initialize Table Of Contents element
             $div_element = $document->createElement('div');
             $div_element->setAttribute('id', 'toc');
+
+            // Add heading element, if enabled
+            if (isset($this->heading)) {
+                $heading_element = $document->createElement('div', $this->heading);
+                $heading_element->setAttribute('class', 'toc-heading');
+                $div_element->appendChild($heading_element);
+            }
+
             $ul_element = $document->createElement('ul');
 
             // Add missing id's to the h tags
