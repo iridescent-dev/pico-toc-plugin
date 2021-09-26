@@ -41,18 +41,20 @@ In your template files, add the plugin's CSS style in the `head` section:
 You can change the default configuration by adding values to your `config.php` file. Here are the options available and what they do.
 * `toc_max_level` - Maximum header level displayed in the table of contents. - *Default value: 5*.
 * `toc_min_headers` - Minimum number of headers required. - *Default value: 2*
+* `toc_heading` - Heading text, if a heading for the table of contents is desired. - *Default value: (unset)*
 
 For reference, these values are set in `config.php` using the following format:
 
 ``` yml
 toc_max_level: 5
 toc_min_headers: 2
+toc_heading: Contents
 ```
 
-This configuration will be applied to the entire site, but it's also possible to override the `toc_max_level` for a specific element using the attribute `max-level`.
+This configuration will be applied to the entire site, but it's also possible to override the `toc_max_level` and `toc_heading` for a specific element using the `max-level` and `heading` attributes, respectively.
 
 ``` html
-<toc max-level="4" />
+<toc max-level="4" heading="Table of Contents" />
 ```
 
 ### Example

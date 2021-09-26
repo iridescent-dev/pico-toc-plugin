@@ -88,8 +88,12 @@ class TableOfContents extends AbstractPicoPlugin
             $div_element->setAttribute('id', 'toc');
 
             // Add heading element, if enabled
-            if (isset($this->heading)) {
-                $heading_element = $document->createElement('div', $this->heading);
+            $heading = $toc_element->getAttribute('heading');
+            if ($heading === '') {
+                $heading = $this->heading;
+            }
+            if (isset($heading)) {
+                $heading_element = $document->createElement('div', $heading);
                 $heading_element->setAttribute('class', 'toc-heading');
                 $div_element->appendChild($heading_element);
             }
