@@ -14,6 +14,8 @@ class TableOfContents extends AbstractPicoPlugin
     private $max_level = 5;
     // Minimum number of headers required.
     private $min_headers = 2;
+    // Heading text, if a heading for the table of contents is desired.
+    private $heading;
 
     /**
      * Triggered after Pico has read its configuration
