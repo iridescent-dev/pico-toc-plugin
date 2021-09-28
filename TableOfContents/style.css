@@ -40,3 +40,8 @@
 .toc-h6 {
     margin-left: 2.5em;
 }
+
+.toc-heading {
+  font-size  : larger;
+  font-weight: bold;
+}
