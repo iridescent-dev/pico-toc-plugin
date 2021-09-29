@@ -28,7 +28,7 @@ In the `.md` file corresponding to your page, simply add the `<toc />` element w
 ### Install
 Extract a copy of the plugin in the `plugins` folder of your project
 * using Composer `composer require iridescent-dev/pico-toc-plugin`
-* or manually `cd plugins && git clone https://github.com/iridescent-dev/pico-toc-plugin.git TableOfContents`
+* or manually `git clone https://github.com/iridescent-dev/pico-toc-plugin.git plugins/TableOfContents`
   
 The structure should be as follows
 ```
