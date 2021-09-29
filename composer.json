@@ -1,0 +1,36 @@
+{
+    "name": "iridescent-dev/pico-toc-plugin",
+    "description": "A Table Of Contents plugin for Pico CMS.",
+    "type": "pico-plugin",
+    "keywords": [ "pico", "picocms", "picocms-plugin", "pico-toc-plugin", "iridescent" ],
+    "homepage": "https://github.com/iridescent-dev/pico-toc-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Véronique Seguela",
+            "email": "veronique@iridescent.dev",
+            "role": "Lead Developer"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/iridescent-dev/pico-toc-plugin/graphs/contributors"
+        }
+    ],
+    "support": {
+        "docs": "https://github.com/iridescent-dev/pico-toc-plugin#readme",
+        "issues": "https://github.com/iridescent-dev/pico-toc-plugin/issues",
+        "source": "https://github.com/iridescent-dev/pico-toc-plugin"
+    },
+    "require": {
+        "php": ">=7.4",
+        "picocms/pico": "^2.1"
+    },
+    "autoload": {
+        "classmap": [
+            "TableOfContents.php",
+            "style.css"
+        ]
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}
