@@ -6,7 +6,7 @@
  * @author  Iridescent
  * @link    https://github.com/iridescent-dev/pico-toc-plugin
  * @license http://opensource.org/licenses/MIT The MIT License
- * @version 1.1
+ * @version 1.2
  */
 class TableOfContents extends AbstractPicoPlugin
 {
