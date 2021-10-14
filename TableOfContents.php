@@ -6,10 +6,12 @@
  * @author  Iridescent
  * @link    https://github.com/iridescent-dev/pico-toc-plugin
  * @license http://opensource.org/licenses/MIT The MIT License
- * @version 1.2
+ * @version 1.3
  */
 class TableOfContents extends AbstractPicoPlugin
 {
+    // Minimum level displayed in the table of contents.
+    private $min_level = 1;
     // Maximum level displayed in the table of contents.
     private $max_level = 5;
     // Minimum number of headers required.
@@ -28,6 +30,9 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onConfigLoaded(&$config)
     {
+        if (isset($config['toc_min_level'])) {
+            $this->min_level = &$config['toc_min_level'];
+        }
         if (isset($config['toc_max_level'])) {
             $this->max_level = &$config['toc_max_level'];
         }
@@ -69,12 +74,21 @@ class TableOfContents extends AbstractPicoPlugin
             $toc_element = $elements[0];
 
             // Get list of headers
+            $min_level = $toc_element->getAttribute('min-level');
+            if ($min_level === '') {
+                $min_level = $this->min_level;
+            }
             $max_level = $toc_element->getAttribute('max-level');
             if ($max_level === '') {
                 $max_level = $this->max_level;
             }
+
+            if ($min_level >= $max_level) {
+                return; // No level to display
+            }
+
             $xPathExpression = [];
-            for ($i = 1; $i <= $max_level; $i++) {
+            for ($i = $min_level; $i <= $max_level; $i++) {
                 $xPathExpression[] = "//h$i";
             }
             $xPathExpression = join("|", $xPathExpression);

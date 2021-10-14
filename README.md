@@ -54,6 +54,7 @@ In your template files, add the plugin's CSS style in the `head` section:
 
 ### Configuration settings
 You can change the default configuration by adding values to your `config.php` file. Here are the options available and what they do.
+* `toc_min_level` - Minimum header level displayed in the table of contents. - *Default value: 1*.
 * `toc_max_level` - Maximum header level displayed in the table of contents. - *Default value: 5*.
 * `toc_min_headers` - Minimum number of headers required. - *Default value: 2*
 * `toc_heading` - Heading text, if a heading for the table of contents is desired. - *Default value: (unset)*
@@ -61,21 +62,20 @@ You can change the default configuration by adding values to your `config.php` f
 For reference, these values are set in `config.php` using the following format:
 
 ``` yml
+toc_min_level: 1
 toc_max_level: 5
 toc_min_headers: 2
 toc_heading: Contents
 ```
 
-This configuration will be applied to the entire site, but it's also possible to override the `toc_max_level` and `toc_heading` for a specific element using the `max-level` and `heading` attributes, respectively.
+This configuration will be applied to the entire site, but it's also possible to override the `toc_min_level`, `toc_max_level` and `toc_heading` for a specific element using the `min-level`, `max-level` and `heading` attributes, respectively.
 
 ``` html
-<toc max-level="4" heading="Table of Contents" />
+<toc min-level="2" max-level="3" heading="Table of Contents" />
 ```
 
 ## Example
 ### The `index.md` file
-
-In this example, the `max-level` is set to 3.
 
 ``` html
 ---
@@ -85,7 +85,7 @@ Description:
 
 Here is the Table Of Contents generated for the current page:
 
-<toc max-level="3" />
+<toc max-level="3" heading="Table of Contents Example" />
 
 # This is a `<h1>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
