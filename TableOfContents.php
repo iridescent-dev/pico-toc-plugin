@@ -6,7 +6,7 @@
  * @author  Iridescent
  * @link    https://github.com/iridescent-dev/pico-toc-plugin
  * @license http://opensource.org/licenses/MIT The MIT License
- * @version 1.3
+ * @version 1.4
  */
 class TableOfContents extends AbstractPicoPlugin
 {
@@ -83,7 +83,7 @@ class TableOfContents extends AbstractPicoPlugin
                 $max_level = $this->max_level;
             }
 
-            if ($min_level >= $max_level) {
+            if ($min_level > $max_level) {
                 return; // No level to display
             }
 

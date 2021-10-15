@@ -26,28 +26,30 @@ In the `.md` file corresponding to your page, simply add the `<toc />` element w
 * [Use it](#usage) by adding `<toc />` element where you want the table of contents to appear on your page.
 
 ### Install
-Extract a copy of the plugin in the `plugins` folder of your project
+Extract a copy of the plugin in the plugins directory of your project
 * using Composer `composer require iridescent-dev/pico-toc-plugin`
-* or manually `git clone https://github.com/iridescent-dev/pico-toc-plugin.git plugins/TableOfContents`
-  
+* or manually by copying the `style.css` and `TableOfContents.php` files in a `TableOfContents` folder
+
 The structure should be as follows
 ```
-project
+pico
 └───plugins
     └───TableOfContents
         │   style.css
         │   TableOfContents.php
 ```
+Replace `pico` with your Pico project directory.
+Replace `plugins` with your plugins directory.
 
 ### Update your theme
 In your template files, add the plugin's CSS style in the `head` section:
 
-``` html
-<!-- index.twig -->
+``` twig
+<!-- index.twig and/or page.twig, etc. -->
 <head>
     ...
     <!-- Table Of Contents -->
-    <link rel="stylesheet" href="{{ base_url }}/plugins/TableOfContents/style.css">
+    <link rel="stylesheet" href="{{ plugins_url }}/TableOfContents/style.css">
     ...
 </head>
 ```
