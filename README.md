@@ -1,48 +1,59 @@
-
-# Pico Table Of Contents Plugin
+Pico Table Of Contents Plugin <!-- omit in toc -->
+==================
 
 Generate a table of contents for the pages of your [Pico](http://picocms.org) site.
 
-- [Pico Table Of Contents Plugin](#pico-table-of-contents-plugin)
-  - [Usage](#usage)
-  - [Getting Started](#getting-started)
-    - [Install](#install)
-    - [Update your theme](#update-your-theme)
-    - [Configuration settings](#configuration-settings)
-  - [Example](#example)
-    - [The `index.md` file](#the-indexmd-file)
-    - [Screenshot](#screenshot)
-  - [License](#license)
+- [Usage](#usage)
+- [Getting Started](#getting-started)
+  - [Install](#install)
+  - [Update your theme](#update-your-theme)
+  - [Configuration settings](#configuration-settings)
+- [Example](#example)
+  - [The `index.md` file](#the-indexmd-file)
+  - [Screenshot](#screenshot)
+- [License](#license)
 
-## Usage
-Automatically generates a table of contents based on the elements `<h1>` to `<h6>` of your page.
 
-In the `.md` file corresponding to your page, simply add the `<toc />` element where you want the table of contents to be inserted. The `<toc />` element must be added for each page you want.
+# Usage
 
-## Getting Started
-* [Add the plugin](#install) to your poject.
-* [Update your theme](#update-your-theme) to include CSS style.
-* [Define the configuration variables](#configuration-settings) if default values are not suitable.
-* [Use it](#usage) by adding `<toc />` element where you want the table of contents to appear on your page.
+Automatically generates a table of contents (ToC) based on the `<h1>` to `<h6>` tags.
 
-### Install
-Extract a copy of the plugin in the plugins directory of your project
-* using Composer `composer require iridescent-dev/pico-toc-plugin`
-* or manually by copying the `style.css` and `TableOfContents.php` files in a `TableOfContents` folder
+In your Markdown file, simply add the `<toc />` tag where you want the ToC to be inserted. This tag must be added for each page you want.
+
+See the [configuration settings](#configuration-settings) section to see the available attributes.
+
+
+# Getting Started
+
+* [Install](#install) the plugin;
+* [Update your theme](#update-your-theme) to add the plugin stylesheet in your Twig templates;
+* Change default [configuration settings](#configuration-settings);
+* [Use it](#usage) by adding the `<toc />` tag where you want the ToC to appear on your page.
+
+
+## Install
+
+Add the plugin in the `plugins` directory of your Pico installation (e.g. `/var/www/html/pico/plugins/`)
+* using [Composer](https://getcomposer.org/) `composer require iridescent-dev/pico-toc-plugin`
+* or manually by uploading the plugin’s files to your `plugins` directory
+  - [download the latest release](https://github.com/iridescent-dev/pico-toc-plugin/releases/latest)
+  - extract the archive into your `plugins` directory
+  - rename the plugin's folder to `TableOfContents`
 
 The structure should be as follows
 ```
-pico
-└───plugins
-    └───TableOfContents
-        │   style.css
-        │   TableOfContents.php
+plugins
+└───TableOfContents
+    │   style.css
+    │   TableOfContents.php
 ```
-Replace `pico` with your Pico project directory.
-Replace `plugins` with your plugins directory.
 
-### Update your theme
-In your template files, add the plugin's CSS style in the `head` section:
+We always recommend you to use Composer whenever possible, because it makes updating the plugin way easier.
+
+
+## Update your theme
+
+In your template files, add a link to the plugin stylesheet in the `head` section:
 
 ``` twig
 <!-- index.twig and/or page.twig, etc. -->
@@ -54,14 +65,16 @@ In your template files, add the plugin's CSS style in the `head` section:
 </head>
 ```
 
-### Configuration settings
-You can change the default configuration by adding values to your `config.php` file. Here are the options available and what they do.
-* `toc_min_level` - Minimum header level displayed in the table of contents. - *Default value: 1*.
-* `toc_max_level` - Maximum header level displayed in the table of contents. - *Default value: 5*.
-* `toc_min_headers` - Minimum number of headers required. - *Default value: 2*
-* `toc_heading` - Heading text, if a heading for the table of contents is desired. - *Default value: (unset)*
 
-For reference, these values are set in `config.php` using the following format:
+## Configuration settings
+
+You can change the default configuration by adding values to your `config` file. Here are the options available and what they do.
+* `toc_min_level` - Minimum header level displayed in the ToC. - *Default value: 1*.
+* `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*.
+* `toc_min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
+* `toc_heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
+
+For reference, these values are set in `config/config.yml` using the following format:
 
 ``` yml
 toc_min_level: 1
@@ -76,8 +89,10 @@ This configuration will be applied to the entire site, but it's also possible to
 <toc min-level="2" max-level="3" heading="Table of Contents" />
 ```
 
-## Example
-### The `index.md` file
+
+# Example
+
+## The `index.md` file
 
 ``` html
 ---
@@ -112,14 +127,16 @@ Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incid
 
 ## An other `<h2>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
-
 ```
 
-### Screenshot
+
+## Screenshot
+
 <p align="center">
   <img src="Screenshot.png" title="Screenshot">
 </p>
 
 
-## License
+# License
+
 Pico Table Of Contents Plugin is open-source licensed under the MIT License. See [LICENSE](LICENSE) for details.
