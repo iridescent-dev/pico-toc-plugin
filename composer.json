@@ -22,7 +22,9 @@
         "source": "https://github.com/iridescent-dev/pico-toc-plugin"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.0"
+    },
+    "require-dev": {
         "picocms/pico": "^2.1"
     },
     "autoload": {

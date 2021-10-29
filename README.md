@@ -48,6 +48,8 @@ plugins
     │   TableOfContents.php
 ```
 
+Pico Table Of Contents plugin requires PHP >=7.0.
+
 We always recommend you to use Composer whenever possible, because it makes updating the plugin way easier.
 
 
