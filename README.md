@@ -75,6 +75,7 @@ You can change the default configuration by adding values to your `config` file.
 * `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*.
 * `toc_min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
 * `toc_heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
+* `toc_style` - The style of list: numbers, bullets or none. - *Default value: none*
 
 For reference, these values are set in `config/config.yml` using the following format:
 
@@ -83,9 +84,10 @@ toc_min_level: 1
 toc_max_level: 5
 toc_min_headers: 2
 toc_heading: Contents
+toc_style: numbers
 ```
 
-This configuration will be applied to the entire site, but it's also possible to override the `toc_min_level`, `toc_max_level` and `toc_heading` for a specific element using the `min-level`, `max-level` and `heading` attributes, respectively.
+This configuration will be applied to the entire site, but it's also possible to override the `toc_min_level`, `toc_max_level`, `toc_heading` and `toc_style` for a specific element using the `min-level`, `max-level`, `heading` and `style` attributes, respectively.
 
 ``` html
 <toc min-level="2" max-level="3" heading="Table of Contents" />
