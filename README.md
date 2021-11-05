@@ -75,7 +75,7 @@ You can change the default configuration by adding values to your `config` file.
 * `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*.
 * `toc_min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
 * `toc_heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
-* `toc_style` - The style of list: numbers, bullets or none. - *Default value: none*
+* `toc_style` - The CSS style of list: **numbers** (1.1, 1.2, ...), **bullets** (●) or **none**. - *Default value: none*
 
 For reference, these values are set in `config/config.yml` using the following format:
 

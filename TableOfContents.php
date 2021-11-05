@@ -166,8 +166,8 @@ class TableOfContents extends AbstractPicoPlugin
      */
     private function get_list($document, $style, $headers, &$index = 0)
     {
-        // Initialize list element: ordered or unordered list
-        $list_element = $document->createElement($style === "numbers" ? 'ol' : 'ul');
+        // Initialize ordered list element
+        $list_element = $document->createElement('ol');
         if (in_array($style, $this->available_styles)) {
             $list_element->setAttribute('class', "toc-$style");
         }
