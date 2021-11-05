@@ -90,7 +90,7 @@ toc_style: numbers
 This configuration will be applied to the entire site, but it's also possible to override the `toc_min_level`, `toc_max_level`, `toc_heading` and `toc_style` for a specific element using the `min-level`, `max-level`, `heading` and `style` attributes, respectively.
 
 ``` html
-<toc min-level="2" max-level="3" heading="Table of Contents" />
+<toc min-level="2" max-level="3" heading="Table of Contents" style="numbers" />
 ```
 
 
@@ -106,7 +106,7 @@ Description:
 
 Here is the Table Of Contents generated for the current page:
 
-<toc max-level="3" heading="Table of Contents Example" />
+<toc max-level="3" heading="Example of Table of Contents" style="numbers" />
 
 # This is a `<h1>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
@@ -123,21 +123,21 @@ Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incid
 ### An other `<h3>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
 
-# An other `<h1>`
+# Again a `<h1>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
 
 ## An other `<h2>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
 
-## An other `<h2>`
-Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
+## And the last `<h2>`
+Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
 ```
 
 
 ## Screenshot
 
 <p align="center">
-  <img src="Screenshot.png" title="Screenshot">
+  <img src="Screenshot.png" title="Screenshot" width="600">
 </p>
 
 
