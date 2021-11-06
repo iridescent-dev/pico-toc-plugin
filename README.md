@@ -71,26 +71,34 @@ In your template files, add a link to the plugin stylesheet in the `head` sectio
 ## Configuration settings
 
 You can change the default configuration by adding values to your `config` file. Here are the options available and what they do.
-* `toc_min_level` - Minimum header level displayed in the ToC. - *Default value: 1*.
-* `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*.
 * `toc_min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
+* `toc_min_level` - Minimum header level displayed in the ToC. - *Default value: 1*
+* `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*
+* `toc_tag` - The tag used for the list. - *Default value: ol*
+  *  **ol** (ordered list)
+  *  **ul** (unordered list)
+* `toc_style` - The css style applied to the list. - *Default value: none*
+  * **numbers** (1, 1.1, 1.2, ...)
+  * **bullets** (● ○ ■)
+  * **none** (no item marker is shown)
+  * **default** (the default css style applied to lists)
 * `toc_heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
-* `toc_style` - The CSS style of list: **numbers** (1.1, 1.2, ...), **bullets** (●) or **none**. - *Default value: none*
 
 For reference, these values are set in `config/config.yml` using the following format:
 
 ``` yml
+toc_min_headers: 2
 toc_min_level: 1
 toc_max_level: 5
-toc_min_headers: 2
-toc_heading: Contents
+toc_tag: ol
 toc_style: numbers
+toc_heading: Contents
 ```
 
-This configuration will be applied to the entire site, but it's also possible to override the `toc_min_level`, `toc_max_level`, `toc_heading` and `toc_style` for a specific element using the `min-level`, `max-level`, `heading` and `style` attributes, respectively.
+This configuration will be applied to the entire site, but it's also possible to override it (except `toc_min_headers`) for a specific element using the `min-level`, `max-level`, `tag`, `style` and `heading` attributes.
 
 ``` html
-<toc min-level="2" max-level="3" heading="Table of Contents" style="numbers" />
+<toc min-level="2" max-level="3" tag="ol" style="numbers" heading="Table of Contents" />
 ```
 
 

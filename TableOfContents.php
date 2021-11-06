@@ -10,17 +10,20 @@
  */
 class TableOfContents extends AbstractPicoPlugin
 {
+    // Minimum number of headers required.
+    private $min_headers = 2;
     // Minimum level displayed in the table of contents.
     private $min_level = 1;
     // Maximum level displayed in the table of contents.
     private $max_level = 5;
-    // Minimum number of headers required.
-    private $min_headers = 2;
+    // The tag used for the list: ol (ordered) or ul (unordered).
+    private $tag = "ol";
+    private $available_tags = ["ol", "ul"];
+    // The css style applied to the list: numbers, bullets, none or default.
+    private $style = "none";
+    private $available_styles = ["numbers", "bullets", "none", "default"];
     // Heading text, if a heading for the table of contents is desired.
     private $heading;
-    // The style of list: numbers, bullets or none.
-    private $style = "none";
-    private $available_styles = ["numbers", "bullets", "none"];
 
     /**
      * Triggered after Pico has read its configuration
@@ -33,17 +36,21 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onConfigLoaded(&$config)
     {
+        if (isset($config['toc_min_headers'])) {
+            $this->min_headers = &$config['toc_min_headers'];
+        }
         if (isset($config['toc_min_level'])) {
             $this->min_level = &$config['toc_min_level'];
         }
         if (isset($config['toc_max_level'])) {
             $this->max_level = &$config['toc_max_level'];
         }
-        if (isset($config['toc_min_headers'])) {
-            $this->min_headers = &$config['toc_min_headers'];
-        }
-        if (isset($config['toc_heading'])) {
-            $this->heading = &$config['toc_heading'];
+        if (isset($config['toc_tag'])) {
+            $tag = &$config['toc_tag'];
+            if (!in_array($tag, $this->available_tags)) {
+                throw new RuntimeException('Invalid toc_tag "' . $tag . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
+            }
+            $this->tag = $tag;
         }
         if (isset($config['toc_style'])) {
             $style = &$config['toc_style'];
@@ -51,6 +58,9 @@ class TableOfContents extends AbstractPicoPlugin
                 throw new RuntimeException('Invalid toc_style "' . $style . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
             }
             $this->style = $style;
+        }
+        if (isset($config['toc_heading'])) {
+            $this->heading = &$config['toc_heading'];
         }
     }
 
@@ -89,8 +99,15 @@ class TableOfContents extends AbstractPicoPlugin
             if ($min_level > $max_level) {
                 return; // No level to display
             }
-            $heading = $toc_element->getAttribute('heading') ?: $this->heading;
+            $tag = $toc_element->getAttribute('tag') ?: $this->tag;
+            if (!in_array($tag, $this->available_tags)) {
+                throw new RuntimeException('Invalid tag "' . $tag . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
+            }
             $style = $toc_element->getAttribute('style') ?: $this->style;
+            if (!in_array($style, $this->available_styles)) {
+                throw new RuntimeException('Invalid style "' . $style . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
+            }
+            $heading = $toc_element->getAttribute('heading') ?: $this->heading;
 
             // Get the list of headers
             $xPathExpression = [];
@@ -117,7 +134,7 @@ class TableOfContents extends AbstractPicoPlugin
             }
 
             // Add the list element
-            $list_element = $this->get_list($document, $style, $headers);
+            $list_element = $this->get_list($document, $tag, $style, $headers);
             $div_element->appendChild($list_element);
 
             $toc_element->parentNode->replaceChild($div_element, $toc_element);
@@ -164,11 +181,11 @@ class TableOfContents extends AbstractPicoPlugin
      * @param integer $index
      * @return DOMElement
      */
-    private function get_list($document, $style, $headers, &$index = 0)
+    private function get_list($document, $tag, $style, $headers, &$index = 0)
     {
         // Initialize ordered list element
-        $list_element = $document->createElement('ol');
-        if (in_array($style, $this->available_styles)) {
+        $list_element = $document->createElement($tag);
+        if ($style !== "default") {
             $list_element->setAttribute('class', "toc-$style");
         }
 
@@ -193,7 +210,7 @@ class TableOfContents extends AbstractPicoPlugin
                 if ($next_header && strtolower($curr_header->tagName) < strtolower($next_header->tagName)) {
                     // The next header is at a lower level -> add nested headers
                     $index++;
-                    $nested_list_element = $this->get_list($document, $style, $headers, $index);
+                    $nested_list_element = $this->get_list($document, $tag, $style, $headers, $index);
                     $li_element->appendChild($nested_list_element);
                 }
 

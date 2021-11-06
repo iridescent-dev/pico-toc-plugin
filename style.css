@@ -7,7 +7,7 @@
 }
 
 
-#toc ol {
+.toc-none, .toc-bullets, .toc-numbers {
     padding-inline-start: 20px;
     padding-block-end   : 8px;
     padding-block-start : 4px;
