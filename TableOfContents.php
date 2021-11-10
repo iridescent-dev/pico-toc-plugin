@@ -6,24 +6,29 @@
  * @author  Iridescent
  * @link    https://github.com/iridescent-dev/pico-toc-plugin
  * @license http://opensource.org/licenses/MIT The MIT License
- * @version 1.5
+ * @version 2.0
  */
 class TableOfContents extends AbstractPicoPlugin
 {
-    // Minimum number of headers required.
-    private $min_headers = 2;
-    // Minimum level displayed in the table of contents.
-    private $min_level = 1;
-    // Maximum level displayed in the table of contents.
-    private $max_level = 5;
-    // The tag used for the list: ol (ordered) or ul (unordered).
-    private $tag = "ol";
-    private $available_tags = ["ol", "ul"];
-    // The css style applied to the list: numbers, bullets, none or default.
-    private $style = "none";
-    private $available_styles = ["numbers", "bullets", "none", "default"];
-    // Heading text, if a heading for the table of contents is desired.
-    private $heading;
+    protected $config = array(
+        // Minimum number of headers required.
+        'min_headers' => 2,
+        // Minimum level displayed in the table of contents.
+        'min_level' => 1,
+        // Maximum level displayed in the table of contents.
+        'max_level' => 5,
+        // The tag used for the list: ol (ordered) or ul (unordered).
+        'tag' => 'ol',
+        // The css style applied to the list: numbers, bullets, none or default.
+        'style' => 'none',
+        // Heading text, if a heading for the table of contents is desired.
+        'heading' => null,
+    );
+
+    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $toc_element_xml;
+
+    protected $available_tags = ['ol', 'ul'];
+    protected $available_styles = ['numbers', 'bullets', 'none', 'default'];
 
     /**
      * Triggered after Pico has read its configuration
@@ -36,31 +41,63 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onConfigLoaded(&$config)
     {
-        if (isset($config['toc_min_headers'])) {
-            $this->min_headers = &$config['toc_min_headers'];
-        }
-        if (isset($config['toc_min_level'])) {
-            $this->min_level = &$config['toc_min_level'];
-        }
-        if (isset($config['toc_max_level'])) {
-            $this->max_level = &$config['toc_max_level'];
-        }
-        if (isset($config['toc_tag'])) {
-            $tag = &$config['toc_tag'];
-            if (!in_array($tag, $this->available_tags)) {
-                throw new RuntimeException('Invalid toc_tag "' . $tag . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
+        if (isset($config['TOC'])) {
+            foreach ($this->config as $key => $val) {
+                if (isset($config['TOC'][$key])) {
+                    $this->config[$key] = &$config['TOC'][$key];
+                }
             }
-            $this->tag = $tag;
-        }
-        if (isset($config['toc_style'])) {
-            $style = &$config['toc_style'];
-            if (!in_array($style, $this->available_styles)) {
-                throw new RuntimeException('Invalid toc_style "' . $style . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
+
+            // Check if the tag is valid
+            if (!in_array($this->config['tag'], $this->available_tags)) {
+                throw new RuntimeException('Invalid TOC tag "' . $this->config['tag'] . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
             }
-            $this->style = $style;
+            // Check if the style is valid
+            if (!in_array($this->config['style'], $this->available_styles)) {
+                throw new RuntimeException('Invalid TOC style "' . $this->config['style'] . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
+            }
         }
-        if (isset($config['toc_heading'])) {
-            $this->heading = &$config['toc_heading'];
+    }
+
+    /**
+     * Triggered when Pico reads its known meta header fields
+     *
+     * @see Pico::getMetaHeaders()
+     *
+     * @param string[] &$headers list of known meta header fields; the array
+     *     key specifies the YAML key to search for, the array value is later
+     *     used to access the found value
+     */
+    public function onMetaHeaders(array &$headers)
+    {
+        $headers['toc'] = 'TOC';
+    }
+
+    /**
+     * Triggered after Pico has parsed the meta header
+     *
+     * @see DummyPlugin::onMetaParsing()
+     * @see Pico::getFileMeta()
+     *
+     * @param string[] &$meta parsed meta data
+     */
+    public function onMetaParsed(array &$meta)
+    {
+        // Checks if the language of the page is set and that it is available for the site
+        $this->min_headers = $this->getVal('min_headers', $meta);
+        $this->min_level = $this->getVal('min_level', $meta);
+        $this->max_level = $this->getVal('max_level', $meta);
+        $this->tag = $this->getVal('tag', $meta);
+        $this->style = $this->getVal('style', $meta);
+        $this->heading = $this->getVal('heading', $meta);
+
+        // Check if the tag is valid
+        if (!in_array($this->tag, $this->available_tags)) {
+            throw new RuntimeException('Invalid tag "' . $this->tag . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
+        }
+        // Check if the style is valid
+        if (!in_array($this->style, $this->available_styles)) {
+            throw new RuntimeException('Invalid style "' . $this->style . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
         }
     }
 
@@ -78,6 +115,9 @@ class TableOfContents extends AbstractPicoPlugin
         if (trim($content) === "") {
             return;
         }
+        if ($this->min_level > $this->max_level) {
+            return; // No level to display
+        }
 
         $document = new DOMDocument('1.0', 'utf-8');
         libxml_use_internal_errors(true);
@@ -89,58 +129,128 @@ class TableOfContents extends AbstractPicoPlugin
             return;
         }
 
-        $elements = $document->getElementsByTagName("toc");
-        if (isset($elements) && $elements->length === 1) {
-            $toc_element = $elements[0];
-
-            // Get tag attributes
-            $min_level = $toc_element->getAttribute('min-level') ?: $this->min_level;
-            $max_level = $toc_element->getAttribute('max-level') ?: $this->max_level;
-            if ($min_level > $max_level) {
-                return; // No level to display
-            }
-            $tag = $toc_element->getAttribute('tag') ?: $this->tag;
-            if (!in_array($tag, $this->available_tags)) {
-                throw new RuntimeException('Invalid tag "' . $tag . '", the possible values are [ ' . implode(', ', $this->available_tags) . ' ].');
-            }
-            $style = $toc_element->getAttribute('style') ?: $this->style;
-            if (!in_array($style, $this->available_styles)) {
-                throw new RuntimeException('Invalid style "' . $style . '", the possible values are [ ' . implode(', ', $this->available_styles) . ' ].');
-            }
-            $heading = $toc_element->getAttribute('heading') ?: $this->heading;
-
-            // Get the list of headers
-            $xPathExpression = [];
-            for ($i = $min_level; $i <= $max_level; $i++) {
-                $xPathExpression[] = "//h$i";
-            }
-            $xPathExpression = join("|", $xPathExpression);
-
-            $domXPath = new DOMXPath($document);
-            $headers = $domXPath->query($xPathExpression);
-            if (!$headers || $headers->length < $this->min_headers) {
-                return; // Not enough header to display
-            }
-
-            // Initialize the Table Of Contents element
-            $div_element = $document->createElement('div');
-            $div_element->setAttribute('id', 'toc');
-
-            // Add heading element, if enabled
-            if (isset($heading)) {
-                $heading_element = $document->createElement('div', $heading);
-                $heading_element->setAttribute('class', 'toc-heading');
-                $div_element->appendChild($heading_element);
-            }
-
-            // Add the list element
-            $list_element = $this->get_list($document, $tag, $style, $headers);
-            $div_element->appendChild($list_element);
-
-            $toc_element->parentNode->replaceChild($div_element, $toc_element);
-
-            $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
+        // Get the list of headers
+        $xPathExpression = [];
+        for ($i = $this->min_level; $i <= $this->max_level; $i++) {
+            $xPathExpression[] = "//h$i";
         }
+        $xPathExpression = join("|", $xPathExpression);
+
+        $domXPath = new DOMXPath($document);
+        $headers = $domXPath->query($xPathExpression);
+        if (!$headers || $headers->length < $this->min_headers) {
+            return; // Not enough header to display
+        }
+
+        // Initialize TOC element
+        $div_element = $document->createElement('div');
+        $div_element->setAttribute('id', 'toc');
+
+        // Add heading element, if enabled
+        if (isset($this->heading)) {
+            $heading_element = $document->createElement('div', $this->heading);
+            $heading_element->setAttribute('class', 'toc-heading');
+            $div_element->appendChild($heading_element);
+        }
+
+        // Add the list element
+        $list_element = $this->getList($document, $headers);
+        $div_element->appendChild($list_element);
+
+        // Replace [toc] in document
+        $nodes = $domXPath->query('//p');
+        foreach ($nodes as $node) {
+            if (trim($node->nodeValue) === "[toc]") {
+                $node->parentNode->replaceChild($div_element, $node);
+                $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
+                break;
+            }
+        }
+
+        // Save the TOC element as string
+        $this->toc_element_xml = $div_element->ownerDocument->saveXML($div_element);
+    }
+
+    /**
+     * Triggered before Pico renders the page
+     *
+     * @see DummyPlugin::onPageRendered()
+     *
+     * @param string &$templateName  file name of the template
+     * @param array  &$twigVariables template variables
+     */
+    public function onPageRendering(&$templateName, array &$twigVariables)
+    {
+        $twigVariables['toc'] = new Twig_Markup($this->toc_element_xml, 'UTF-8');
+    }
+
+    /* ********************************************************************************* */
+
+    /**
+     * Return the value from the key in metadatas if it exists, default config value otherwise.
+     *
+     * @param string $key
+     * @param string[] $meta parsed meta data
+     * @return string
+     */
+    private function getVal($key, $meta)
+    {
+        return (isset($meta['toc']) && isset($meta['toc'][$key])) ? $meta['toc'][$key] : $this->config[$key];
+    }
+
+    /**
+     * Creates a list element from the headers.
+     * Function called recursively to create nested lists.
+     *
+     * @param DOMDocument $document
+     * @param DOMNodeList $headers
+     * @param integer $index
+     * @return DOMElement
+     */
+    private function getList($document, $headers, &$index = 0)
+    {
+        // Initialize ordered list element
+        $list_element = $document->createElement($this->tag);
+        if ($this->style !== "default") {
+            $list_element->setAttribute('class', "toc-$this->style");
+        }
+
+        for ($index; $index < $headers->length; $index++) {
+            $curr_header = $headers[$index];
+            if (isset($curr_header->tagName) && $curr_header->tagName !== '') {
+                // Add missing id's to the h tags
+                $id = $curr_header->getAttribute('id');
+                if ($id === "") {
+                    $id = $this->slugify($curr_header->nodeValue);
+                    $curr_header->setAttribute('id', $id);
+                }
+
+                // Initialize the list item with a link to the header
+                $li_element = $document->createElement('li');
+                $a_element = $document->createElement('a');
+                $a_element->setAttribute('href', "#$id");
+                $a_element->nodeValue = $curr_header->nodeValue;
+                $li_element->appendChild($a_element);
+
+                $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
+                if ($next_header && strtolower($curr_header->tagName) < strtolower($next_header->tagName)) {
+                    // The next header is at a lower level -> add nested headers
+                    $index++;
+                    $nested_list_element = $this->getList($document, $headers, $index);
+                    $li_element->appendChild($nested_list_element);
+                }
+
+                $list_element->appendChild($li_element);
+
+                // Refresh next_header with the updated index
+                $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
+                if ($next_header && strtolower($curr_header->tagName) > strtolower($next_header->tagName)) {
+                    // The next header is at a higher level -> stop current loop
+                    break;
+                }
+            }
+        }
+        return $list_element;
     }
 
     /**
@@ -169,61 +279,5 @@ class TableOfContents extends AbstractPicoPlugin
         }
 
         return $text;
-    }
-
-    /**
-     * Creates a list element from the headers.
-     * Function called recursively to create nested lists.
-     *
-     * @param DOMDocument $document
-     * @param string $style
-     * @param DOMNodeList $headers
-     * @param integer $index
-     * @return DOMElement
-     */
-    private function get_list($document, $tag, $style, $headers, &$index = 0)
-    {
-        // Initialize ordered list element
-        $list_element = $document->createElement($tag);
-        if ($style !== "default") {
-            $list_element->setAttribute('class', "toc-$style");
-        }
-
-        for ($index; $index < $headers->length; $index++) {
-            $curr_header = $headers[$index];
-            if (isset($curr_header->tagName) && $curr_header->tagName !== '') {
-                // Add missing id's to the h tags
-                $id = $curr_header->getAttribute('id');
-                if ($id === "") {
-                    $id = $this->slugify($curr_header->nodeValue);
-                    $curr_header->setAttribute('id', $id);
-                }
-
-                // Initialize the list item with a link to the header
-                $li_element = $document->createElement('li');
-                $a_element = $document->createElement('a');
-                $a_element->setAttribute('href', "#$id");
-                $a_element->nodeValue = $curr_header->nodeValue;
-                $li_element->appendChild($a_element);
-
-                $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
-                if ($next_header && strtolower($curr_header->tagName) < strtolower($next_header->tagName)) {
-                    // The next header is at a lower level -> add nested headers
-                    $index++;
-                    $nested_list_element = $this->get_list($document, $tag, $style, $headers, $index);
-                    $li_element->appendChild($nested_list_element);
-                }
-
-                $list_element->appendChild($li_element);
-
-                // Refresh next_header with the updated index
-                $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
-                if ($next_header && strtolower($curr_header->tagName) > strtolower($next_header->tagName)) {
-                    // The next header is at a higher level -> stop current loop
-                    break;
-                }
-            }
-        }
-        return $list_element;
     }
 }
