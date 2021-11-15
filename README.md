@@ -8,9 +8,12 @@ Generate a table of contents for the pages of your [Pico](http://picocms.org) si
   - [Install](#install)
   - [Update your theme](#update-your-theme)
   - [Configuration settings](#configuration-settings)
+  - [Template variables defined for Twig](#template-variables-defined-for-twig)
 - [Example](#example)
   - [The `index.md` file](#the-indexmd-file)
   - [Screenshot](#screenshot)
+- [Changelog](#changelog)
+  - [2.0](#20)
 - [License](#license)
 
 
@@ -18,9 +21,11 @@ Generate a table of contents for the pages of your [Pico](http://picocms.org) si
 
 Automatically generates a table of contents (ToC) based on the `<h1>` to `<h6>` tags.
 
-In your Markdown file, simply add the `<toc />` tag where you want the ToC to be inserted. This tag must be added for each page you want.
+In your Markdown file, simply add the `[toc]` marker where you want the ToC to be inserted. This marker must be added for each page you want. You must add a new line before and after the marker.
 
-See the [configuration settings](#configuration-settings) section to see the available attributes.
+You can also add the ToC directly in your theme by using the `{{ toc }}` Twig variable in your template.
+
+See the [configuration settings](#configuration-settings) section to see the available options.
 
 
 # Getting Started
@@ -28,7 +33,7 @@ See the [configuration settings](#configuration-settings) section to see the ava
 * [Install](#install) the plugin;
 * [Update your theme](#update-your-theme) to add the plugin stylesheet in your Twig templates;
 * Change default [configuration settings](#configuration-settings);
-* [Use it](#usage) by adding the `<toc />` tag where you want the ToC to appear on your page.
+* [Use it](#usage) by adding the `[toc]` marker or the `{{ toc }}` Twig variable where you want the ToC to appear on your page.
 
 
 ## Install
@@ -62,7 +67,7 @@ In your template files, add a link to the plugin stylesheet in the `head` sectio
 <head>
     ...
     <!-- Table Of Contents -->
-    <link rel="stylesheet" href="{{ plugins_url }}/TableOfContents/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ plugins_url }}/TableOfContents/style.css" />
     ...
 </head>
 ```
@@ -71,50 +76,59 @@ In your template files, add a link to the plugin stylesheet in the `head` sectio
 ## Configuration settings
 
 You can change the default configuration by adding values to your `config` file. Here are the options available and what they do.
-* `toc_min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
-* `toc_min_level` - Minimum header level displayed in the ToC. - *Default value: 1*
-* `toc_max_level` - Maximum header level displayed in the ToC. - *Default value: 5*
-* `toc_tag` - The tag used for the list. - *Default value: ol*
+* `min_headers` - Minimum number of headers required to display the ToC. - *Default value: 2*
+* `min_level` - Minimum header level displayed in the ToC. - *Default value: 1*
+* `max_level` - Maximum header level displayed in the ToC. - *Default value: 5*
+* `tag` - The tag used for the list. - *Default value: ol*
   *  **ol** (ordered list)
   *  **ul** (unordered list)
-* `toc_style` - The css style applied to the list. - *Default value: none*
+* `style` - The css style applied to the list. - *Default value: none*
   * **numbers** (1, 1.1, 1.2, ...)
   * **bullets** (● ○ ■)
   * **none** (no item marker is shown)
   * **default** (the default css style applied to lists)
-* `toc_heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
+* `heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
 
 For reference, these values are set in `config/config.yml` using the following format:
 
 ``` yml
-toc_min_headers: 2
-toc_min_level: 1
-toc_max_level: 5
-toc_tag: ol
-toc_style: numbers
-toc_heading: Contents
+##
+# Table Of Contents Plugin
+#
+TOC:
+  min_headers: 2
+  min_level: 1
+  max_level: 5
+  tag: ol
+  style: none
+  heading: Contents
 ```
 
-This configuration will be applied to the entire site, but it's also possible to override it (except `toc_min_headers`) for a specific element using the `min-level`, `max-level`, `tag`, `style` and `heading` attributes.
+This configuration will be applied to the entire site, but it's also possible to override it for a specific page by adding the Meta headers with the same format (see the [example](#example)).
 
-``` html
-<toc min-level="2" max-level="3" tag="ol" style="numbers" heading="Table of Contents" />
-```
+
+## Template variables defined for Twig
+
+* `{{ toc }}` - The HTML code of the ToC for the current page.
 
 
 # Example
 
 ## The `index.md` file
 
-``` html
+```
 ---
 Title: Table Of Contents Example
 Description: 
+TOC:
+  max_level: 3
+  style: numbers
+  heading: Example of Table of Contents
 ---
 
 Here is the Table Of Contents generated for the current page:
 
-<toc max-level="3" heading="Example of Table of Contents" style="numbers" />
+[toc]
 
 # This is a `<h1>`
 Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. 
@@ -147,6 +161,16 @@ Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incid
 <p align="center">
   <img src="Screenshot.png" title="Screenshot" width="600">
 </p>
+
+
+# Changelog
+## 2.0
+* Breaking changes
+  * Replaces the `<toc/>` element with the `[toc]` marker to be compatible with Nextcloud.
+  * Renames and restructures configuration options.
+  * Override the configuration for a specific page using Meta headers instead of tag attributes.
+* New features
+  * Add the `{{ toc }}` Twig variable.
 
 
 # License
