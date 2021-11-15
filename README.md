@@ -67,7 +67,7 @@ In your template files, add a link to the plugin stylesheet in the `head` sectio
 <head>
     ...
     <!-- Table Of Contents -->
-    <link rel="stylesheet" href="{{ plugins_url }}/TableOfContents/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ plugins_url }}/TableOfContents/style.css" />
     ...
 </head>
 ```
