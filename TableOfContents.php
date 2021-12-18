@@ -193,7 +193,6 @@ class TableOfContents extends AbstractPicoPlugin
         foreach ($nodes as $node) {
             if (trim($node->nodeValue) === "[toc]") {
                 $node->parentNode->replaceChild($div_element, $node);
-                break;
             }
         }
 
