@@ -112,6 +112,31 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onContentParsed(&$content)
     {
+        return;
+    }
+
+    /**
+     * Triggered before Pico renders the page
+     *
+     * @see DummyPlugin::onPageRendered()
+     *
+     * @param string &$templateName  file name of the template
+     * @param array  &$twigVariables template variables
+     */
+    public function onPageRendering(&$templateName, array &$twigVariables)
+    {
+        $twigVariables['toc'] = new Twig_Markup("<p>[toc]</p>", 'UTF-8');
+    }
+
+    /**
+     * Triggered after Pico has rendered the page
+     *
+     * @see DummyPlugin::onPageRendering()
+     *
+     * @param string &$content output contents (HTML) of the final page
+     */
+    public function onPageRendered(&$content)
+    {
         if (trim($content) === "") {
             return;
         }
@@ -167,19 +192,6 @@ class TableOfContents extends AbstractPicoPlugin
         }
 
         $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
-    }
-
-    /**
-     * Triggered before Pico renders the page
-     *
-     * @see DummyPlugin::onPageRendered()
-     *
-     * @param string &$templateName  file name of the template
-     * @param array  &$twigVariables template variables
-     */
-    public function onPageRendering(&$templateName, array &$twigVariables)
-    {
-        $twigVariables['toc'] = new Twig_Markup("<p>[toc]</p>", 'UTF-8');
     }
 
     /* ********************************************************************************* */
