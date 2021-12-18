@@ -169,30 +169,32 @@ class TableOfContents extends AbstractPicoPlugin
 
         $domXPath = new DOMXPath($document);
         $headers = $domXPath->query($xPathExpression);
-        if (!$headers || $headers->length < $this->min_headers) {
-            return; // Not enough header to display
+        if ($headers && $headers->length >= $this->min_headers) { // Enough header to display
+            // Initialize TOC element
+            $div_element = $document->createElement('div');
+            $div_element->setAttribute('id', 'toc');
+
+            // Add heading element, if enabled
+            if (isset($this->heading)) {
+                $heading_element = $document->createElement('div', $this->heading);
+                $heading_element->setAttribute('class', 'toc-heading');
+                $div_element->appendChild($heading_element);
+            }
+
+            // Add the list element
+            $list_element = $this->getList($document, $headers);
+            $div_element->appendChild($list_element);
         }
-
-        // Initialize TOC element
-        $div_element = $document->createElement('div');
-        $div_element->setAttribute('id', 'toc');
-
-        // Add heading element, if enabled
-        if (isset($this->heading)) {
-            $heading_element = $document->createElement('div', $this->heading);
-            $heading_element->setAttribute('class', 'toc-heading');
-            $div_element->appendChild($heading_element);
-        }
-
-        // Add the list element
-        $list_element = $this->getList($document, $headers);
-        $div_element->appendChild($list_element);
 
         // Replace [toc] in document
         $nodes = $domXPath->query('//p');
         foreach ($nodes as $node) {
             if (trim($node->nodeValue) === "[toc]") {
-                $node->parentNode->replaceChild($div_element, $node);
+                if (isset($div_element)) {
+                    $node->parentNode->replaceChild($div_element, $node);
+                } else {
+                     $node->parentNode->removeChild($node);
+                }
             }
         }
 
