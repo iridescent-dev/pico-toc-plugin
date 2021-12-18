@@ -161,9 +161,9 @@ class TableOfContents extends AbstractPicoPlugin
         $xPathExpression = [];
         for ($i = $this->min_level; $i <= $this->max_level; $i++) {
             if (isset($this->container)) {
-                $xPathExpression[] = "//* [@id='$this->container']//h$i";
+                $xPathExpression[] = "//* [@id='$this->container']//h$i [not(contains(@class,'not-in-toc'))]";
             } else
-                $xPathExpression[] = "//h$i";
+                $xPathExpression[] = "//h$i [not(contains(@class,'not-in-toc'))]";
         }
         $xPathExpression = join("|", $xPathExpression);
 
