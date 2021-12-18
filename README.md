@@ -88,6 +88,7 @@ You can change the default configuration by adding values to your `config` file.
   * **none** (no item marker is shown)
   * **default** (the default css style applied to lists)
 * `heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
+* `container` - ID of parent DOM element which content will be scanned for headers. - *Default value: (unset)*
 
 For reference, these values are set in `config/config.yml` using the following format:
 
@@ -102,6 +103,7 @@ TOC:
   tag: ol
   style: none
   heading: Contents
+  container: main
 ```
 
 This configuration will be applied to the entire site, but it's also possible to override it for a specific page by adding the Meta headers with the same format (see the [example](#example)).
