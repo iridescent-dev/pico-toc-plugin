@@ -23,9 +23,11 @@ class TableOfContents extends AbstractPicoPlugin
         'style' => 'none',
         // Heading text, if a heading for the table of contents is desired.
         'heading' => null,
+        // ID of parent container which content will be scanned for TOC
+        'container' => null,
     );
 
-    protected $min_headers, $min_level, $max_level, $tag, $style, $heading;
+    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $container;
 
     protected $available_tags = ['ol', 'ul'];
     protected $available_styles = ['numbers', 'bullets', 'none', 'default'];
@@ -90,6 +92,7 @@ class TableOfContents extends AbstractPicoPlugin
         $this->tag = $this->getVal('tag', $meta);
         $this->style = $this->getVal('style', $meta);
         $this->heading = $this->getVal('heading', $meta);
+        $this->container = $this->getVal('container', $meta);
 
         // Check if the tag is valid
         if (!in_array($this->tag, $this->available_tags)) {
@@ -157,7 +160,10 @@ class TableOfContents extends AbstractPicoPlugin
         // Get the list of headers
         $xPathExpression = [];
         for ($i = $this->min_level; $i <= $this->max_level; $i++) {
-            $xPathExpression[] = "//h$i";
+            if (isset($this->container)) {
+                $xPathExpression[] = "//* [@id='$this->container']//h$i";
+            } else
+                $xPathExpression[] = "//h$i";
         }
         $xPathExpression = join("|", $xPathExpression);
 
