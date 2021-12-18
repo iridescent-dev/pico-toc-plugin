@@ -25,7 +25,7 @@ class TableOfContents extends AbstractPicoPlugin
         'heading' => null,
     );
 
-    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $toc_element_xml;
+    protected $min_headers, $min_level, $max_level, $tag, $style, $heading;
 
     protected $available_tags = ['ol', 'ul'];
     protected $available_styles = ['numbers', 'bullets', 'none', 'default'];
@@ -167,9 +167,6 @@ class TableOfContents extends AbstractPicoPlugin
         }
 
         $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
-
-        // Save the TOC element as string
-        $this->toc_element_xml = $div_element->ownerDocument->saveXML($div_element);
     }
 
     /**
@@ -182,7 +179,7 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onPageRendering(&$templateName, array &$twigVariables)
     {
-        $twigVariables['toc'] = new Twig_Markup($this->toc_element_xml, 'UTF-8');
+        $twigVariables['toc'] = new Twig_Markup("<p>[toc]</p>", 'UTF-8');
     }
 
     /* ********************************************************************************* */
