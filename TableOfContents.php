@@ -187,7 +187,7 @@ class TableOfContents extends AbstractPicoPlugin
         }
 
         // Replace [toc] in document
-        $nodes = $domXPath->query('//p');
+        $nodes = $domXPath->query("//p[. = '[toc]']");
         foreach ($nodes as $node) {
             if (trim($node->nodeValue) === "[toc]") {
                 if (isset($div_element)) {
