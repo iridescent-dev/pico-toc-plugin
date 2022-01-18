@@ -162,10 +162,11 @@ class TableOfContents extends AbstractPicoPlugin
         foreach ($nodes as $node) {
             if (trim($node->nodeValue) === "[toc]") {
                 $node->parentNode->replaceChild($div_element, $node);
-                $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
                 break;
             }
         }
+
+        $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
 
         // Save the TOC element as string
         $this->toc_element_xml = $div_element->ownerDocument->saveXML($div_element);
