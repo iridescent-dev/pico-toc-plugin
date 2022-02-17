@@ -23,9 +23,11 @@ class TableOfContents extends AbstractPicoPlugin
         'style' => 'none',
         // Heading text, if a heading for the table of contents is desired.
         'heading' => null,
+        // ID of parent container which content will be scanned for TOC
+        'container' => null,
     );
 
-    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $toc_element_xml;
+    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $container;
 
     protected $available_tags = ['ol', 'ul'];
     protected $available_styles = ['numbers', 'bullets', 'none', 'default'];
@@ -90,6 +92,7 @@ class TableOfContents extends AbstractPicoPlugin
         $this->tag = $this->getVal('tag', $meta);
         $this->style = $this->getVal('style', $meta);
         $this->heading = $this->getVal('heading', $meta);
+        $this->container = $this->getVal('container', $meta);
 
         // Check if the tag is valid
         if (!in_array($this->tag, $this->available_tags)) {
@@ -112,6 +115,31 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onContentParsed(&$content)
     {
+        return;
+    }
+
+    /**
+     * Triggered before Pico renders the page
+     *
+     * @see DummyPlugin::onPageRendered()
+     *
+     * @param string &$templateName  file name of the template
+     * @param array  &$twigVariables template variables
+     */
+    public function onPageRendering(&$templateName, array &$twigVariables)
+    {
+        $twigVariables['toc'] = new Twig_Markup("<p>[toc]</p>", 'UTF-8');
+    }
+
+    /**
+     * Triggered after Pico has rendered the page
+     *
+     * @see DummyPlugin::onPageRendering()
+     *
+     * @param string &$content output contents (HTML) of the final page
+     */
+    public function onPageRendered(&$content)
+    {
         if (trim($content) === "") {
             return;
         }
@@ -132,57 +160,45 @@ class TableOfContents extends AbstractPicoPlugin
         // Get the list of headers
         $xPathExpression = [];
         for ($i = $this->min_level; $i <= $this->max_level; $i++) {
-            $xPathExpression[] = "//h$i";
+            if (isset($this->container)) {
+                $xPathExpression[] = "//* [@id='$this->container']//h$i [not(contains(@class,'not-in-toc'))]";
+            } else
+                $xPathExpression[] = "//h$i [not(contains(@class,'not-in-toc'))]";
         }
         $xPathExpression = join("|", $xPathExpression);
 
         $domXPath = new DOMXPath($document);
         $headers = $domXPath->query($xPathExpression);
-        if (!$headers || $headers->length < $this->min_headers) {
-            return; // Not enough header to display
+        if ($headers && $headers->length >= $this->min_headers) { // Enough header to display
+            // Initialize TOC element
+            $div_element = $document->createElement('div');
+            $div_element->setAttribute('id', 'toc');
+
+            // Add heading element, if enabled
+            if (isset($this->heading)) {
+                $heading_element = $document->createElement('div', $this->heading);
+                $heading_element->setAttribute('class', 'toc-heading');
+                $div_element->appendChild($heading_element);
+            }
+
+            // Add the list element
+            $list_element = $this->getList($document, $headers);
+            $div_element->appendChild($list_element);
         }
-
-        // Initialize TOC element
-        $div_element = $document->createElement('div');
-        $div_element->setAttribute('id', 'toc');
-
-        // Add heading element, if enabled
-        if (isset($this->heading)) {
-            $heading_element = $document->createElement('div', $this->heading);
-            $heading_element->setAttribute('class', 'toc-heading');
-            $div_element->appendChild($heading_element);
-        }
-
-        // Add the list element
-        $list_element = $this->getList($document, $headers);
-        $div_element->appendChild($list_element);
 
         // Replace [toc] in document
-        $nodes = $domXPath->query('//p');
+        $nodes = $domXPath->query("//p[. = '[toc]']");
         foreach ($nodes as $node) {
             if (trim($node->nodeValue) === "[toc]") {
-                $node->parentNode->replaceChild($div_element, $node);
-                break;
+                if (isset($div_element)) {
+                    $node->parentNode->replaceChild($div_element, $node);
+                } else {
+                     $node->parentNode->removeChild($node);
+                }
             }
         }
 
         $content = preg_replace(array("/<(!DOCTYPE|\?xml).+?>/", "/<\/?(html|body)>/"), array("", ""), $document->saveHTML());
-
-        // Save the TOC element as string
-        $this->toc_element_xml = $div_element->ownerDocument->saveXML($div_element);
-    }
-
-    /**
-     * Triggered before Pico renders the page
-     *
-     * @see DummyPlugin::onPageRendered()
-     *
-     * @param string &$templateName  file name of the template
-     * @param array  &$twigVariables template variables
-     */
-    public function onPageRendering(&$templateName, array &$twigVariables)
-    {
-        $twigVariables['toc'] = new Twig_Markup($this->toc_element_xml, 'UTF-8');
     }
 
     /* ********************************************************************************* */
