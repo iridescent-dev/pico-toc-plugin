@@ -255,7 +255,7 @@ class TableOfContents extends AbstractPicoPlugin
                 // Add missing id's to the h tags
                 $id = $curr_header->getAttribute('id');
                 if ($id === "") {
-                    $id = $this->slugify($curr_header->nodeValue);
+                    $id = $this->slugify($curr_header->nodeValue) . '-' . $index;
                     $curr_header->setAttribute('id', $id);
                 }
 
