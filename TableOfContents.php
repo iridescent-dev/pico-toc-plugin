@@ -23,9 +23,17 @@ class TableOfContents extends AbstractPicoPlugin
         'style' => 'none',
         // Heading text, if a heading for the table of contents is desired.
         'heading' => null,
+        // Show/hide the table of contents by default.
+        'toggle' => true,
+        // Hide toc initially
+        'initially_hide' => true,
+        // Hide text
+        'hide_text' => '▲',
+        // Show text
+        'show_text' => '▼',
     );
 
-    protected $min_headers, $min_level, $max_level, $tag, $style, $heading, $toc_element_xml;
+    protected $min_headers, $min_level, $max_level, $tag, $style, $toggle, $initially_hide, $hide_text, $show_text, $heading, $toc_element_xml;
 
     protected $available_tags = ['ol', 'ul'];
     protected $available_styles = ['numbers', 'bullets', 'none', 'default'];
@@ -90,6 +98,10 @@ class TableOfContents extends AbstractPicoPlugin
         $this->tag = $this->getVal('tag', $meta);
         $this->style = $this->getVal('style', $meta);
         $this->heading = $this->getVal('heading', $meta);
+        $this->initially_hide = $this->getVal('initially_hide', $meta);
+        $this->toggle = $this->getVal('toggle', $meta);
+        $this->hide_text = $this->getVal('hide_text', $meta);
+        $this->show_text = $this->getVal('show_text', $meta);
 
         // Check if the tag is valid
         if (!in_array($this->tag, $this->available_tags)) {
@@ -147,9 +159,21 @@ class TableOfContents extends AbstractPicoPlugin
         $div_element->setAttribute('id', 'toc');
 
         // Add heading element, if enabled
-        if (isset($this->heading)) {
-            $heading_element = $document->createElement('div', $this->heading);
+        if (isset($this->heading) || $this->toggle) {
+            $heading_element = $document->createElement('div', isset($this->heading) ? $this->heading : '&nbsp;');
             $heading_element->setAttribute('class', 'toc-heading');
+            
+            // Create the toogle button element if enabled
+            if($this->toggle)
+            {
+                $button_element = $document->createElement('button', $this->initially_hide ? $this->show_text : $this->hide_text);
+                $button_element->setAttribute('id', 'toc-toggle');
+                $button_element->setAttribute('data-show-text', $this->show_text);
+                $button_element->setAttribute('data-hide-text', $this->hide_text);
+
+                $heading_element->appendChild($button_element);
+            }
+
             $div_element->appendChild($heading_element);
         }
 
@@ -208,7 +232,7 @@ class TableOfContents extends AbstractPicoPlugin
      * @param integer $index
      * @return DOMElement
      */
-    private function getList($document, $headers, &$index = 0)
+    private function getList($document, $headers, &$index = 0, $isTopLevel = true)
     {
         // Initialize ordered list element
         $list_element = $document->createElement($this->tag);
@@ -216,13 +240,25 @@ class TableOfContents extends AbstractPicoPlugin
             $list_element->setAttribute('class', "toc-$this->style");
         }
 
+        if ($this->toggle && $isTopLevel)
+            {
+                if ($this->initially_hide === true) {
+                    $list_element->setAttribute('class', 'toc-hide');
+                } else {
+                    $list_element->setAttribute('class', 'toc-show');
+                }
+            }
+
         for ($index; $index < $headers->length; $index++) {
             $curr_header = $headers[$index];
             if (isset($curr_header->tagName) && $curr_header->tagName !== '') {
+                $header_classes = explode(' ', $curr_header->getAttribute('class'));
+				$is_unlisted = in_array('unlisted', $header_classes);
+
                 // Add missing id's to the h tags
                 $id = $curr_header->getAttribute('id');
                 if ($id === "") {
-                    $id = $this->slugify($curr_header->nodeValue);
+                    $id = $this->slugify($curr_header->nodeValue) . '-' . $index;
                     $curr_header->setAttribute('id', $id);
                 }
 
@@ -237,11 +273,15 @@ class TableOfContents extends AbstractPicoPlugin
                 if ($next_header && strtolower($curr_header->tagName) < strtolower($next_header->tagName)) {
                     // The next header is at a lower level -> add nested headers
                     $index++;
-                    $nested_list_element = $this->getList($document, $headers, $index);
-                    $li_element->appendChild($nested_list_element);
+                    $nested_list_element = $this->getList($document, $headers, $index, false);
+                    if ($nested_list_element->hasChildNodes()) { 
+						$li_element->appendChild($nested_list_element);
+					};
                 }
 
-                $list_element->appendChild($li_element);
+                if (!$is_unlisted) {
+					$list_element->appendChild($li_element);
+				}
 
                 // Refresh next_header with the updated index
                 $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;

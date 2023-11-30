@@ -1,7 +1,7 @@
 #toc {
     border          : 1px solid #cdd;
     background-color: #f5f5ff;
-    margin          : 0;
+    margin          : 20px 0 20px 0;
     padding         : 1em;
     font-size       : 80%;
 }
@@ -29,7 +29,7 @@
 
 .toc-numbers {
     counter-reset  : item;
-    list-style-type: none;  
+    list-style-type: none; 
 }
 .toc-numbers li:before {
     content          : counters(item, ". ") ". ";
@@ -39,4 +39,21 @@
 .toc-heading {
     font-size  : larger;
     font-weight: bold;
+    position: relative;
+}
+
+#toc-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Weitere Stiloptionen nach Wunsch */
+}
+
+.toc-hide {
+    display: none; 
+}
+
+.toc-show {
+    display: inherit;
 }
