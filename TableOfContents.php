@@ -219,6 +219,9 @@ class TableOfContents extends AbstractPicoPlugin
         for ($index; $index < $headers->length; $index++) {
             $curr_header = $headers[$index];
             if (isset($curr_header->tagName) && $curr_header->tagName !== '') {
+                $header_classes = explode(' ', $curr_header->getAttribute('class'));
+				$is_unlisted = in_array('unlisted', $header_classes);
+
                 // Add missing id's to the h tags
                 $id = $curr_header->getAttribute('id');
                 if ($id === "") {
@@ -241,7 +244,9 @@ class TableOfContents extends AbstractPicoPlugin
                     $li_element->appendChild($nested_list_element);
                 }
 
-                $list_element->appendChild($li_element);
+                if (!$is_unlisted) {
+					$list_element->appendChild($li_element);
+				}
 
                 // Refresh next_header with the updated index
                 $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
