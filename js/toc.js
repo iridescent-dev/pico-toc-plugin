@@ -9,11 +9,11 @@ if (toggleTocElement) {
                 if (xElement.classList.contains("toc-hide")) {
                     xElement.classList.remove("toc-hide");
                     xElement.classList.add("toc-show");
-                    this.innerText = this.getAttribute('data-show-text');
+                    this.innerText = this.getAttribute('data-hide-text');
                 } else if (xElement.classList.contains("toc-show")) {
                     xElement.classList.remove("toc-show");
                     xElement.classList.add("toc-hide");
-                    this.innerText = this.getAttribute('data-hide-text');
+                    this.innerText = this.getAttribute('data-show-text');
                 }
             }
         }
