@@ -274,7 +274,9 @@ class TableOfContents extends AbstractPicoPlugin
                     // The next header is at a lower level -> add nested headers
                     $index++;
                     $nested_list_element = $this->getList($document, $headers, $index, false);
-                    $li_element->appendChild($nested_list_element);
+                    if ($nested_list_element->hasChildNodes()) { 
+						$li_element->appendChild($nested_list_element);
+					};
                 }
 
                 if (!$is_unlisted) {
