@@ -230,7 +230,7 @@ class TableOfContents extends AbstractPicoPlugin
                 $li_element = $document->createElement('li');
                 $a_element = $document->createElement('a');
                 $a_element->setAttribute('href', "#$id");
-                $a_element->nodeValue = $curr_header->nodeValue;
+                $a_element->nodeValue = $this->extractTextWithoutCertainTags($curr_header, ['sup']);
                 $li_element->appendChild($a_element);
 
                 $next_header = ($index + 1 < $headers->length) ? $headers[$index + 1] : null;
@@ -252,6 +252,33 @@ class TableOfContents extends AbstractPicoPlugin
             }
         }
         return $list_element;
+    }
+
+    /**
+     * Extract text from a node without the text from certain tags.
+     *
+     * @param DOMNode $node
+     * @param string[] $ignoredTags
+     * @return string
+     */
+    private function extractTextWithoutCertainTags($node, $ignoredTags)
+    {
+        $text = '';
+
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_TEXT_NODE) {
+                // Add text from text nodes
+                $text .= $child->nodeValue;
+            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
+                // Check if the current tag is not in the list of ignored tags
+                if (!in_array(strtolower($child->tagName), $ignoredTags, true)) {
+                    // Recursively get text from elements that are not in the ignored list
+                    $text .= $this->extractTextWithoutCertainTags($child, $ignoredTags);
+                }
+            }
+        }
+
+        return $text;
     }
 
     /**
