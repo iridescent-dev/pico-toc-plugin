@@ -182,7 +182,7 @@ class TableOfContents extends AbstractPicoPlugin
      */
     public function onPageRendering(&$templateName, array &$twigVariables)
     {
-        $twigVariables['toc'] = new Twig_Markup($this->toc_element_xml, 'UTF-8');
+        $twigVariables['toc'] = new \Twig\Markup($this->toc_element_xml, 'UTF-8');
     }
 
     /* ********************************************************************************* */
