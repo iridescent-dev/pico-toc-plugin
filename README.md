@@ -51,6 +51,8 @@ plugins
 └───TableOfContents
     │   style.css
     │   TableOfContents.php
+    └───js
+    	|   toc.js
 ```
 
 Pico Table Of Contents plugin requires PHP >=7.0.
@@ -70,6 +72,11 @@ In your template files, add a link to the plugin stylesheet in the `head` sectio
     <link rel="stylesheet" type="text/css" href="{{ plugins_url }}/TableOfContents/style.css" />
     ...
 </head>
+...
+...
+<!-- TOC   -->
+<script src="{{ plugins_url }}/TableOfContents/js/toc.js"></script>
+</body>
 ```
 
 
@@ -88,6 +95,10 @@ You can change the default configuration by adding values to your `config` file.
   * **none** (no item marker is shown)
   * **default** (the default css style applied to lists)
 * `heading` - Heading text, if a heading for the ToC is desired. - *Default value: (unset)*
+* `toggle` - Activate the Show/Hide button or not. - *Default value: (true)*
+* `initially_hide` - Hidden ToC in initial state or not. - *Default value: (true)*
+* `hide_text` - The text of the button to hide the menu. - *Default value: (▲)*
+* `hide_text` - The text of the button to make the menu visible. - *Default value: (▼)*
 
 For reference, these values are set in `config/config.yml` using the following format:
 
@@ -102,6 +113,10 @@ TOC:
   tag: ol
   style: none
   heading: Contents
+  toggle: true
+  initially_hide: true
+  hide_text: ▲
+  show_text: ▼
 ```
 
 This configuration will be applied to the entire site, but it's also possible to override it for a specific page by adding the Meta headers with the same format (see the [example](#example)).
