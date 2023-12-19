@@ -240,14 +240,13 @@ class TableOfContents extends AbstractPicoPlugin
             $list_element->setAttribute('class', "toc-$this->style");
         }
 
-        if ($this->toggle && $isTopLevel)
-            {
-                if ($this->initially_hide === true) {
-                    $list_element->setAttribute('class', 'toc-hide');
-                } else {
-                    $list_element->setAttribute('class', 'toc-show');
-                }
-            }
+        if ($this->toggle && $isTopLevel) {
+            $currentClass = $list_element->getAttribute('class');
+            $additionalClass = $this->initially_hide ? 'toc-hide' : 'toc-show';
+
+            $newClass = $currentClass . ($currentClass ? ' ' : '') . $additionalClass;
+            $list_element->setAttribute('class', $newClass);
+        }
 
         for ($index; $index < $headers->length; $index++) {
             $curr_header = $headers[$index];
